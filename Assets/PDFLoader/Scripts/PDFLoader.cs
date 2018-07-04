@@ -16,7 +16,7 @@ namespace BABINIKU.PDF
         /// ページ数0以上になるようにする。
         /// </summary>
         int _page;
-        int page
+        int currentPage
         {
             get { return _page; }
             set
@@ -25,8 +25,9 @@ namespace BABINIKU.PDF
                 {
                     _page = Mathf.Max(value, 0);
                 }
-                else {
-                    _page = Mathf.Clamp(value, 0, info.imageFileURIs.Length-1);
+                else
+                {
+                    _page = Mathf.Clamp(value, 0, info.imageFileURIs.Length - 1);
                 }
             }
         }
@@ -36,7 +37,7 @@ namespace BABINIKU.PDF
         PDFImageDirInfo info;
 
 
-        bool isLoaded;
+        ReactiveProperty<bool> isPDFLoadedProperty = new ReactiveProperty<bool>();
         RawImage rawImage;
 
         ///NOWLOADINGの表示
@@ -44,25 +45,42 @@ namespace BABINIKU.PDF
 
         void Start()
         {
-
             gen = new PDFGenerator();
             rawImage = GetComponent<RawImage>();
             Load("samplePDF");
+
+            isPDFLoadedProperty.ObserveOnMainThread().Subscribe(loaded =>
+            {
+                if (loaded)
+                {
+                    //PDFロードが完了した時
+                    StartCoroutine(LoadPage(0));
+                    loadingObject.SetActive(false);
+
+                }
+                else
+                {
+                    //初期化された時
+                    currentPage = 0;
+                    loadingObject.SetActive(true);
+                    info = null;
+                }
+            });
         }
 
         //矢印キーで次前スライド
         private void Update()
         {
-            if (!isLoaded) return;
+            if (!isPDFLoadedProperty.Value) return;
             if (Input.GetKeyDown(KeyCode.RightArrow))
             {
-                page++;
-                StartCoroutine(LoadPage(page));
+                currentPage++;
+                StartCoroutine(LoadPage(currentPage));
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                page--;
-                StartCoroutine(LoadPage(page));
+                currentPage--;
+                StartCoroutine(LoadPage(currentPage));
             }
         }
 
@@ -72,21 +90,14 @@ namespace BABINIKU.PDF
         /// <param name="pdfName"></param>
         void Load(string pdfName)
         {
-            isLoaded = false;
-            page = 0;
-            loadingObject.SetActive(true);
-
+            isPDFLoadedProperty.Value = false;
 
             gen.PDFGenerateObservable(pdfName)
-                .ObserveOnMainThread()
                 .Subscribe(n =>
-            {
-                info = new PDFImageDirInfo(n);
-                loadingObject.SetActive(false);
-                isLoaded = true;
-                StartCoroutine(LoadPage(0));
-
-            });
+                {
+                    info = new PDFImageDirInfo(n);
+                    isPDFLoadedProperty.Value = true;
+                });
         }
 
         /// <summary>
@@ -97,19 +108,14 @@ namespace BABINIKU.PDF
         IEnumerator LoadPage(int pageCount)
         {
             var uri = "file://" + info.imageFileURIs[pageCount];
-
             using (var www = new WWW(uri))
             {
-
                 while (!www.isDone)
                 {
                     yield return null;
                 }
-
                 rawImage.texture = www.texture;
             }
         }
-
-
     }
 }
