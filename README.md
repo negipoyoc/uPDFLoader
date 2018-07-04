@@ -10,8 +10,8 @@ PDF変換時に連番画像のパスを取得しているのでそれを用い�
 * [GhostScriptのインストール](https://www.ghostscript.com/download/gsdnld.html)
 * UniRxの導入
 
-# UnityPackage版を使っている人へ
-Assets/PDFLoader/StreamingAssetsをAssets/StreamingAssetsに移動してください
+# UnityPackage版
+[リリースチャンネルの方を参照して下さい](https://github.com/negipoyoc/uPDFLoader/releases)
 
 
 # 注意
