@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using System.Linq;
-namespace BABINIKU.PDF
+namespace uPDFLoader
 {
     /// <summary>
     /// PDFを画像化した際に作られるディレクトリと画像Arrayの情報

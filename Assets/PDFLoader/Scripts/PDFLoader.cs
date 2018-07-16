@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UniRx;
 using System;
 
-namespace BABINIKU.PDF
+namespace uPDFLoader
 {
     /// <summary>
     /// Loadのサンプル

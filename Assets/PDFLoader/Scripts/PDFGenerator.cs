@@ -5,7 +5,7 @@ using UniRx;
 using System.Diagnostics;
 using System.IO;
 
-namespace BABINIKU.PDF
+namespace uPDFLoader
 {
     /// <summary>
     /// PDFを連番JPGにするbatファイルを動かす。
